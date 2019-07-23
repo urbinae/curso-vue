@@ -4,41 +4,59 @@
 	<meta charset="UTF-8">
 	<title>VUEjs V2 Filtros | Rimorsoft Online</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
 </head>
 <body>
-	<div id="main" class="container">
-		<div class="row">
-			<div class="col-sm-4">
-				<h1>VUEjs - Filtros</h1>	
-				<button v-on:click="getUsers" class="btn btn-primary" v-if="!lists.length">Listar</button>		
-				<ul class="list-group" v-else>
-					<li class="list-group-item">
-						<input type="text" placeholder="Buscar" class="form-control" v-model="name">
-					</li>
-					<li v-for="item in searchUser" class="list-group-item">
-						{{ item.name }}
-					</li>
-				</ul>	
-			</div>
-			<div class="col-sm-8">
-				<h1>JSON</h1>
-				<pre>
-					{{ $data }}
-				</pre>
-			</div>
-		</div>
-	</div>
-	
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.5/vue.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://rawgit.com/select2/select2/master/dist/js/select2.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.1/vue.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
+	
+	<link href="https://rawgit.com/select2/select2/master/dist/css/select2.min.css" rel="stylesheet"/>
+
+	<div id="app">
+
+	  <select id="miSelect"></select>
+	  <span>Selected: {{ selected }}</span>
+
+	</div>
+
 	<script type="text/javascript">
-		new Vue({
-			el: '#main',
-			data: {
-				lists: [],
-				name: '',
-			},	
-			methods: {
+		
+
+		var vm = new Vue({
+		  data: {
+		    selected: 'A',
+		    options: [
+		      { text: 'One', id: 'A' },
+		      { text: 'Two', id: 'B' },
+		      { text: 'Three', id: 'C' }
+		    ]
+		  },
+		  mounted() {
+		  	let self = this; // ámbito de vue
+		    
+		    // inicializas select2
+		    $('#miSelect')
+		      .select2({ 
+		      	placeholder: 'Select an option',
+		      	data: self.options, // cargas los datos en vez de usar el loop
+		       })
+		       // nos hookeamos en el evento tal y como puedes leer en su documentación
+		       .on('select2:select', function () {       
+		       	var value = $("#miSelect").select2('data');
+		        // nos devuelve un array
+		        
+		        // ahora simplemente asignamos el valor a tu variable selected de VUE
+		        self.selected = value[0].id
+		      })
+		  },
+		  methods: {
 				getUsers: function () {
 					var urlUsers = 'https://jsonplaceholder.typicode.com/users';
 					axios.get(urlUsers).then(response => {
@@ -46,13 +64,9 @@
 					});
 				}
 			},
-			computed: {
-				searchUser: function () {
-					return this.lists.filter((item) => item.name.includes(this.name));
-				}
-			}
-		});
+		}).$mount('#app');
 	</script>
+
 </body>
 
 
