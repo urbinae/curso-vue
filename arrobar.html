@@ -8,62 +8,100 @@
 </head>
 <body>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.5/vue.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.0/vue.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-	<script src="https://rawgit.com/select2/select2/master/dist/js/select2.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.1/vue.min.js"></script>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
-	
 	<link href="https://rawgit.com/select2/select2/master/dist/css/select2.min.css" rel="stylesheet"/>
 
 	<div id="app">
-
-	  <select id="miSelect"></select>
-	  <span>Selected: {{ selected }}</span>
+		<div class="col-sm-4">
+			<label>Comentario</label>
+		  	<textarea v-model="texto" v-model="name" class="form-control" placeholder="Añadir mensaje"></textarea>
+		  	<ul>
+			  	<li v-for="item in searchUser" class="user-group-item" v-if="flag">
+					{{ item.name }}
+				</li>
+			</ul>
+			<div v-if="flag">
+				<select v-if="flag" v-model="selected">
+				  <option v-for="item in searchUser" v-bind:value="item.name">
+				    {{ item.name }}
+				  </option>
+				</select>
+				<span>Seleccionado: {{ selected }} </span>
+			</div>
+		</div>
+		<div class="col-sm-8">
+			<h1>Usuarios de jsonplaceholder</h1>
+				<pre>
+					{{ $data }}
+				</pre>
+		</div>
 
 	</div>
 
 	<script type="text/javascript">
-		
-
 		var vm = new Vue({
-		  data: {
-		    selected: 'A',
-		    options: [
-		      { text: 'One', id: 'A' },
-		      { text: 'Two', id: 'B' },
-		      { text: 'Three', id: 'C' }
-		    ]
-		  },
-		  mounted() {
-		  	let self = this; // ámbito de vue
-		    
-		    // inicializas select2
-		    $('#miSelect')
-		      .select2({ 
-		      	placeholder: 'Select an option',
-		      	data: self.options, // cargas los datos en vez de usar el loop
-		       })
-		       // nos hookeamos en el evento tal y como puedes leer en su documentación
-		       .on('select2:select', function () {       
-		       	var value = $("#miSelect").select2('data');
-		        // nos devuelve un array
-		        
-		        // ahora simplemente asignamos el valor a tu variable selected de VUE
-		        self.selected = value[0].id
-		      })
-		  },
-		  methods: {
+			data: {
+			    texto: '',
+			    users: [],
+			    name: '',
+			    flag: false,
+			    selected : ''
+			  },
+			created: function () {
+			    console.log('flag is: ' + this.flag);
+
+			    this.getUsers();
+			  },
+			watch: {
+			    texto: function(newVal, oldVal) {
+			    	if(newVal.includes('@')){
+			    		var i = newVal.indexOf("@");
+			    		var aux_name = newVal.substr(i+1,newVal.lenght);
+			    		this.name = aux_name;
+
+					    console.log('texto ' + this.texto);
+					    console.log('name ' + aux_name);
+					    this.flag = true;
+					    this.texto = newVal;
+					    console.log('flag is: ' + this.flag);
+					}
+					else{
+						this.flag = false;
+						console.log('flag is: ' + this.flag);
+					}
+			    },
+			    selected: function(newVal, oldVal){
+			    	console.log('usuario ' + newVal);
+			    	var i = this.texto.indexOf("@");
+			    	var delete_str = this.texto.substr(i,this.texto.lenght);
+			    	this.texto = this.texto.replace(delete_str, newVal);
+
+			    	console.log('texto ' + this.texto);
+			    }
+			  },
+			methods:{
+			  	arroba: function() {
+				    var context = this;
+				    /*Vue.nextTick(function () {
+				        alert(context.texto);
+				    })*/
+				},
 				getUsers: function () {
 					var urlUsers = 'https://jsonplaceholder.typicode.com/users';
 					axios.get(urlUsers).then(response => {
-						this.lists = response.data
+						this.users = response.data
 					});
 				}
 			},
+			computed: {
+				searchUser: function () {
+					return this.users.filter(
+						(item) => item.name.includes(this.name)
+					);
+				}
+			}
 		}).$mount('#app');
 	</script>
 
