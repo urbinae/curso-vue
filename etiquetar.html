@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>VUEjs V2 Etiquetar usuarios. Eimar Urbina</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    </head>
+    <body>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.0/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
+
+        <link href="https://rawgit.com/select2/select2/master/dist/css/select2.min.css" rel="stylesheet"/>
+
+        <div id="app">
+            <div class="col-sm-4">
+                
+                </p>
+                <label>Comentario</label>
+                <textarea v-model="texto" v-model="name" class="form-control" placeholder="Añadir mensaje"></textarea>
+                <div v-if="flag">
+                    <select v-if="flag" v-model="selected" class="form-control">
+                        <option v-for="item in searchUser" v-bind:value="item.name">
+                            {{ item.name }}
+                        </option>
+                    </select>
+                    <input type="text" class="buscar">
+                </div>
+
+
+            </div>
+            <div class="col-sm-8">
+                <h1>Usuarios de jsonplaceholder</h1>
+                <pre>
+					{{ $data }}
+                </pre>
+            </div>
+
+        </div>
+        <hr>
+
+        <script type="text/javascript">
+            var vm = new Vue({
+                data: {
+                    texto: '',
+                    users: [],
+                    name: '',
+                    flag: false,
+                    selected: ''
+                },
+                created: function () {
+                    console.log('flag is: ' + this.flag);
+
+                    this.getUsers();
+                },
+                watch: {
+                    texto: function (newVal, oldVal) {
+                        if (newVal.includes('@')) {
+                            var i = newVal.indexOf("@");
+                            var aux_name = newVal.substr(i + 1, newVal.lenght);
+                            this.name = aux_name;
+
+                            console.log('texto ' + this.texto);
+                            console.log('name ' + aux_name);
+                            
+                            this.flag = true;
+                            this.texto = newVal;
+                            console.log('flag is: ' + this.flag);
+                        } else {
+                            this.flag = false;
+                            console.log('flag is: ' + this.flag);
+                        }
+                    },
+                    selected: function (newVal, oldVal) {
+                        console.log('usuario ' + newVal);
+                        var i = this.texto.indexOf("@");
+                        var delete_str = this.texto.substr(i, this.texto.lenght);
+                        this.texto = this.texto.replace(delete_str, newVal);
+
+                        console.log('texto ' + this.texto);
+                    }
+                },
+                methods: {
+                    arroba: function () {
+                        //var context = this;
+                        console.log('cambio');
+                        /*Vue.nextTick(function () {
+                         alert(context.texto);
+                         })*/
+                    },
+                    getUsers: function () {
+                        var urlUsers = 'https://jsonplaceholder.typicode.com/users';
+                        axios.get(urlUsers).then(response => {
+                            this.users = response.data
+                        });
+                    }
+                },
+                computed: {
+                    searchUser: function () {
+                        return this.users.filter(
+                                (item) => item.name.includes(this.name)
+                        );
+                    }
+                }
+            }).$mount('#app');
+            
+        </script>
+
+    </body>
+
+
+
+
+

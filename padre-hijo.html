@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>VUEjs V2 Etiquetar usuarios. Eimar Urbina</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+</head>
+<body>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.0/vue.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
+
+	<link href="https://rawgit.com/select2/select2/master/dist/css/select2.min.css" rel="stylesheet"/>
+
+	<div id="app">
+	    <comentario ></comentario>
+	</div>
+
+	<script type="text/javascript">
+		Vue.component('comentario', {//padre
+		  template: `//html
+		  <div>
+		  	<h2>Comentario: {{comentario}}</h2>
+		  	<button class="btn brn-danger" @click="comentario+=comentario">Concatenar</button>
+		  	{{nombrePadre}}
+		  	<areatexto :texto="comentario" @nombreHijo="nombrePadre=$event"></areatexto>
+		  </div>`,
+		  data(){
+		  	return {
+		  		comentario:'Hola @ ',
+		  		nombrePadre:''
+		  	}
+		  }
+		});
+
+		Vue.component('areatexto', {//hijo
+		  template: `//html
+		  <div>
+		  	<p contenteditable="true">{{texto}}</p>
+		  	<p>Nombre: {{nombre}}</p>
+		  </div>`,
+		  props:['texto'],
+		  data(){
+		  	return{
+		  		nombre:'Emilio'
+		  	}
+		  },
+		  mounted(){
+		  	this.$emit('nombreHijo',this.nombre);
+		  }
+		  
+		});
+
+		var vm = new Vue({
+		  
+		}).$mount('#app');
+	</script>
+</body>
+
+
+
+
+

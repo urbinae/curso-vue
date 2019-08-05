@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>VUEjs V2 Etiquetar usuarios. Eimar Urbina</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    </head>
+    <body>
+
+        <script src="https://unpkg.com/vue"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.0/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+        <div id="app">
+            <grand-parent/>
+        </div>
+
+        <script type="text/javascript">
+            // texto component
+            Vue.component('ChildB', {
+                template: `
+    <div id="child-b">
+      <h2>Child B</h2>
+      <pre>data {{ this.$data }}</pre>
+      <hr/>
+    </div>`,
+            })
+
+            Vue.component('ParentB', {
+                template: `
+    <div id="parent-b">
+      <h2>Parent B</h2>
+      <pre>data {{ this.$data }}</pre>
+      <hr/>
+    </div>`,
+            })
+
+            Vue.component('GrandParent', {
+                template: `
+    <div id="grandparent">
+      <h2>Grand Parent</h2>
+      <pre>data {{ this.$data }}</pre>
+      <hr/>
+      <parent-a/>
+      <parent-b/>
+    </div>`,
+            })
+
+            const eventBus = new Vue() // 1.Declaring
+
+
+            Vue.component('ChildA', {
+                template: `
+    <div id="child-a">
+      <h2>Child A</h2>
+      <pre>data {{ this.$data }}</pre>
+      <hr/>
+      <button @click="changeScore">Change Score</button>
+      <span>Score: {{ score }}</span>
+    </div>`,
+                props: ["score"],
+                methods: {
+                    changeScore() {
+                        eventBus.$emit('updatingScore', 200)  // 2.Emitting
+                    }
+                }
+            })
+
+            Vue.component('ParentA', {
+                template: `
+    <div id="parent-a">
+      <h2>Parent A</h2>
+      <pre>data {{ this.$data }}</pre>
+      <button @click="reRender">Rerender Parent</button>
+      <hr/>
+      <child-a :score="score"/>
+      <child-b/>
+    </div>`,
+                data() {
+                    return {
+                        score: 100
+                    }
+                },
+                created() {
+                    eventBus.$on('updatingScore', this.updateScore)  // 3.Listening
+                },
+                methods: {
+                    reRender() {
+                        this.$forceUpdate()
+                    },
+                    updateScore(newValue) {
+                        console.log(newValue);
+                        this.score = newValue
+                    }
+                }
+            })
+
+            new Vue({
+                el: '#app'
+            })
+
+        </script>
+
+    </body>
+
+
+
+
+
